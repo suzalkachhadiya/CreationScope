@@ -1,5 +1,5 @@
 from crewai import Agent
-from tools import research_tool#, scrapper_tools
+from tools import research_tool, scrapper_tools
 from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
 import os
@@ -22,7 +22,7 @@ research_agent = Agent(
         tools=[research_tool],
         verbose=True,
         llm=llm,
-        allow_delegation=False
+        allow_delegation=True
     )
 
 # scraper_agent = Agent(
@@ -39,3 +39,15 @@ research_agent = Agent(
 #         allow_delegation=False
 #     )
 
+ai_usecase_agent = Agent(
+    role='AI Solutions Strategist',
+    goal='Analyze industry standards and generate AI/ML use cases for {company}',
+    memory=True,
+    backstory="""You are an AI/ML solutions expert with deep experience in enterprise digital transformation. 
+    Your expertise spans across GenAI, Large Language Models, and ML implementations across various industries. 
+    You excel at identifying opportunities where AI can create business value and improve operational efficiency.""",
+    tools=scrapper_tools,
+    verbose=True,
+    llm=llm,
+    allow_delegation=False
+)
