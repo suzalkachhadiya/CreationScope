@@ -1,11 +1,9 @@
 from crewai import Agent
-from tools import research_tool, scrapper_tools
+from tools import research_tool, scrapper_tools, google_datasets_tools, github_datasets_tools, kaggle_datasets_tools
 from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
 import os
 load_dotenv()
-
-# print(type(scraper_agent))
 
 llm=ChatGoogleGenerativeAI(model="gemini-1.5-flash",
                         verbose=True,
@@ -19,10 +17,11 @@ research_agent = Agent(
         company research and market analysis. Your expertise lies in gathering and 
         synthesizing information from various sources to provide detailed insights.
         """,
-        tools=[research_tool],
+        tools=research_tool,
         verbose=True,
         llm=llm,
-        allow_delegation=True
+        allow_delegation=True,
+        max_retry_limit=1
     )
 
 # scraper_agent = Agent(
@@ -49,5 +48,19 @@ ai_usecase_agent = Agent(
     tools=scrapper_tools,
     verbose=True,
     llm=llm,
-    allow_delegation=False
+    allow_delegation=True,
+    max_retry_limit=1
+)
+
+resource_collector = Agent(
+    role='Resource and Dataset Specialist',
+    goal='Collect and curate relevant datasets and resources for AI use cases',
+    backstory="""You are an expert in finding and evaluating datasets and technical resources. 
+    You have extensive experience with data repositories, open-source projects, and AI resources. 
+    You excel at matching business use cases with appropriate datasets and technical solutions.""",
+    tools=research_tool+github_datasets_tools+google_datasets_tools+kaggle_datasets_tools,
+    verbose=True,
+    llm=llm,
+    allow_delegation=False,
+    max_retry_limit=1    
 )
